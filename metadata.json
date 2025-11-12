@@ -1,0 +1,5 @@
+{
+  "name": "Commercial Proposal & Payment Flow Builder",
+  "description": "A comprehensive tool for creating and managing commercial proposals and constructing detailed payment schedules. Users can define proposal values, dynamically add, remove, and reorder payment installments, and instantly see a summary and a full payment cronogram. The application also supports exporting the schedule to PDF, Excel, and CSV formats.",
+  "requestFramePermissions": []
+}
