@@ -10,7 +10,7 @@ import { formatCurrency, parseCurrency, monthStep } from './utils/formatting';
 
 const Header: React.FC = () => (
   <header className="text-center mb-10">
-    <img src="/logo.svg" alt="KTL Kotler Real Estate Investments" className="mx-auto w-48 h-auto mb-5" />
+    <img src="/logo.png" alt="KTL Kotler Real Estate Investments" className="mx-auto w-56 h-auto mb-5 mix-blend-multiply" />
     <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Simulador de Proposta</h1>
     <p className="text-md md:text-lg text-gray-500">Construa e visualize fluxos de pagamento de forma simples.</p>
   </header>
