@@ -21,3 +21,6 @@ export const parseCurrency = (value: string): number => {
   
   return isNaN(numberValue) ? 0 : numberValue;
 };
+// Meses entre parcelas consecutivas de um mesmo tipo.
+const MONTH_STEP: Record<string, number> = { anual: 12, semestral: 6, trimestral: 3 };
+export const monthStep = (type: string): number => MONTH_STEP[type.trim().toLowerCase()] ?? 1;

@@ -1,15 +1,16 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { addMonths, format } from 'date-fns';
-import type { Installment, ScheduleItem, ProposalInfo } from './types';
+import { addMonths, format, isValid } from 'date-fns';
+import type { Installment, ScheduleItem, ProposalInfo, SavedProposal } from './types';
 import FlowBuilder from './components/FlowBuilder';
 import Results from './components/Results';
 import FinancingDetails from './components/FinancingDetails';
-import { formatCurrency, parseCurrency } from './utils/formatting';
+import SavedProposals from './components/SavedProposals';
+import { formatCurrency, parseCurrency, monthStep } from './utils/formatting';
 
 const Header: React.FC = () => (
   <header className="text-center mb-10">
-    <img src="https://picsum.photos/180/60" alt="Logo" className="mx-auto w-48 h-auto mb-5 rounded" />
+    <img src="/logo.svg" alt="KTL Kotler Real Estate Investments" className="mx-auto w-48 h-auto mb-5" />
     <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Simulador de Proposta</h1>
     <p className="text-md md:text-lg text-gray-500">Construa e visualize fluxos de pagamento de forma simples.</p>
   </header>
@@ -30,6 +31,14 @@ const App: React.FC = () => {
   const [installments, setInstallments] = useState<Installment[]>([]);
   const [interestRate, setInterestRate] = useState<number>(0);
   const [term, setTerm] = useState<number>(0);
+
+  const loadProposal = (p: SavedProposal) => {
+    setProposalInfo(p.proposalInfo);
+    setProposedValue(p.proposedValue);
+    setInstallments(p.installments);
+    setInterestRate(p.interestRate);
+    setTerm(p.term);
+  };
 
   const handleProposalInfoChange = (field: keyof ProposalInfo, value: string | number) => {
     setProposalInfo(prev => ({ ...prev, [field]: value }));
@@ -111,12 +120,13 @@ const App: React.FC = () => {
 
     const newSchedule: ScheduleItem[] = [];
     installments.forEach(inst => {
+      // Campo de data vazio ou incompleto gera Invalid Date; format() lançaria e derrubaria a tela.
+      const start = new Date((inst.startDate || '').replace(/-/g, '/'));
       for (let i = 0; i < inst.quantity; i++) {
-        const paymentDate = addMonths(new Date(inst.startDate.replace(/-/g, '/')), i);
         newSchedule.push({
           installmentNumber: `${i + 1}/${inst.quantity}`,
           type: inst.type,
-          paymentDate: format(paymentDate, 'dd/MM/yyyy'),
+          paymentDate: isValid(start) ? format(addMonths(start, i * monthStep(inst.type)), 'dd/MM/yyyy') : '—',
           value: inst.value,
         });
       }
@@ -153,10 +163,16 @@ const App: React.FC = () => {
       <Header />
 
       <div className="space-y-6">
+        <SavedProposals
+          current={{ proposalInfo, proposedValue, installments, interestRate, term }}
+          defaultName={[proposalInfo.clientName, proposalInfo.project, proposalInfo.unit].filter(Boolean).join(' - ')}
+          onLoad={loadProposal}
+        />
+
         <div className="card bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <h2 className="card-title text-xl font-semibold mb-5 text-gray-800 flex items-center gap-3">
                 <div className="bg-blue-100 p-2 rounded-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 </div>
                 Dados do Imóvel
             </h2>

@@ -25,3 +25,11 @@ export interface ProposalInfo {
 }
 
 export type ExportFormat = 'pdf' | 'xlsx' | 'csv';
+
+export interface SavedProposal {
+  proposalInfo: ProposalInfo;
+  proposedValue: number;
+  installments: Installment[];
+  interestRate: number;
+  term: number;
+}
